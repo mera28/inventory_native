@@ -1,0 +1,15 @@
+# Matikan navigasi direktori (mencegah pengguna melihat daftar isi folder secara langsung)
+Options -Indexes
+
+# Aktifkan Mod Engine Rewrite
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Mencegah akses langsung ke folder sensitif seperti app dan config dari browser
+    RewriteRule ^(app|config)/ - [F,L]
+
+    # Mengarahkan request yang menuju file/folder yang tidak ada ke Front Controller (index.php)
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
