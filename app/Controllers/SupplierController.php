@@ -13,6 +13,12 @@ class SupplierController {
 
     public function index() {
         $suppliers = $this->supplierModel->getAll();
+        $editSupplier = null;
+
+        if (isset($_GET['edit_id'])) {
+            $editSupplier = $this->supplierModel->getById($_GET['edit_id']);
+        }
+
         require_once __DIR__ . '/../../views/suppliers/index.php';
     }
 
@@ -28,6 +34,25 @@ class SupplierController {
 
             if (!empty($name)) {
                 $this->supplierModel->create($name, $phone, $address);
+            }
+            header("Location: index.php?action=suppliers");
+            exit();
+        }
+    }
+
+    public function update() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!Csrf::verifyToken($_POST['csrf_token'] ?? '')) {
+                die("CSRF Token Invalid!");
+            }
+
+            $id = Sanitize::clean($_POST['id'] ?? '');
+            $name = Sanitize::clean($_POST['name'] ?? '');
+            $phone = Sanitize::clean($_POST['phone'] ?? '');
+            $address = Sanitize::clean($_POST['address'] ?? '');
+
+            if (!empty($id) && !empty($name)) {
+                $this->supplierModel->update($id, $name, $phone, $address);
             }
             header("Location: index.php?action=suppliers");
             exit();

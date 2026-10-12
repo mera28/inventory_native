@@ -2,13 +2,8 @@
 
 class Sanitize {
     public static function clean($data) {
-        if (is_array($data)) {
-            foreach ($data as $key => $value) {
-                $data[$key] = self::clean($value);
-            }
-        } else {
-            $data = trim(htmlspecialchars($data, ENT_QUOTES, 'UTF-8'));
-        }
+        $data = trim($data);
+        $data = strip_tags($data); // Menghapus tag HTML liar, tapi tidak mengubah karakter &
         return $data;
     }
 }

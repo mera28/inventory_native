@@ -26,24 +26,32 @@ if (!isset($_SESSION['user_id'])) {
 
     <div class="container mt-4">
         <div class="row">
-            <!-- Form Tambah Produk -->
+            <!-- Form Tambah / Edit Produk -->
             <div class="col-md-4 mb-3">
                 <div class="card shadow-sm">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="card-title mb-0">Tambah Produk</h5>
+                    <div class="card-header <?= $editProduct ? 'bg-warning text-dark' : 'bg-success text-white'; ?>">
+                        <h5 class="card-title mb-0">
+                            <?= $editProduct ? 'Edit Produk' : 'Tambah Produk'; ?>
+                        </h5>
                     </div>
                     <div class="card-body">
-                        <form action="index.php?action=products_store" method="POST">
+                        <form action="index.php?action=<?= $editProduct ? 'products_update' : 'products_store'; ?>" method="POST">
                             <input type="hidden" name="csrf_token" value="<?= Csrf::generateToken(); ?>">
                             
+                            <?php if ($editProduct): ?>
+                                <input type="hidden" name="id" value="<?= $editProduct['id']; ?>">
+                            <?php endif; ?>
+
                             <div class="mb-3">
                                 <label class="form-label">SKU / Kode Barang</label>
-                                <input type="text" name="sku" class="form-control" placeholder="BRG-001" required>
+                                <input type="text" name="sku" class="form-control" placeholder="BRG-001" required
+                                       value="<?= htmlspecialchars($editProduct['sku'] ?? ''); ?>">
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Nama Produk</label>
-                                <input type="text" name="name" class="form-control" placeholder="Nama Produk" required>
+                                <input type="text" name="name" class="form-control" placeholder="Nama Produk" required
+                                       value="<?= htmlspecialchars($editProduct['name'] ?? ''); ?>">
                             </div>
 
                             <div class="mb-3">
@@ -51,22 +59,32 @@ if (!isset($_SESSION['user_id'])) {
                                 <select name="category_id" class="form-select" required>
                                     <option value="">-- Pilih Kategori --</option>
                                     <?php foreach ($categories as $cat): ?>
-                                        <option value="<?= $cat['id']; ?>"><?= htmlspecialchars($cat['name']); ?></option>
+                                        <option value="<?= $cat['id']; ?>" <?= isset($editProduct) && $editProduct['category_id'] == $cat['id'] ? 'selected' : ''; ?>>
+                                            <?= htmlspecialchars($cat['name']); ?>
+                                        </option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Harga (Rp)</label>
-                                <input type="number" name="price" class="form-control" value="0" required>
+                                <input type="number" name="price" class="form-control" required
+                                       value="<?= $editProduct['price'] ?? 0; ?>">
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Stok Awal</label>
-                                <input type="number" name="stock" class="form-control" value="0" required>
+                                <label class="form-label">Stok</label>
+                                <input type="number" name="stock" class="form-control" required
+                                       value="<?= $editProduct['stock'] ?? 0; ?>">
                             </div>
 
-                            <button type="submit" class="btn btn-success w-100">Simpan Produk</button>
+                            <button type="submit" class="btn <?= $editProduct ? 'btn-warning' : 'btn-success'; ?> w-100">
+                                <?= $editProduct ? 'Update Produk' : 'Simpan Produk'; ?>
+                            </button>
+
+                            <?php if ($editProduct): ?>
+                                <a href="index.php?action=products" class="btn btn-outline-secondary w-100 mt-2">Batal Edit</a>
+                            <?php endif; ?>
                         </form>
                     </div>
                 </div>
@@ -101,6 +119,8 @@ if (!isset($_SESSION['user_id'])) {
                                                 <td>Rp <?= number_format($p['price'], 0, ',', '.'); ?></td>
                                                 <td><span class="badge bg-info text-dark"><?= $p['stock']; ?></span></td>
                                                 <td class="text-center">
+                                                    <a href="index.php?action=products&edit_id=<?= $p['id']; ?>" 
+                                                       class="btn btn-warning btn-sm">Edit</a>
                                                     <a href="index.php?action=products_delete&id=<?= $p['id']; ?>" 
                                                        class="btn btn-danger btn-sm" 
                                                        onclick="return confirm('Hapus produk ini?')">Hapus</a>

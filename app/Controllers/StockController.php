@@ -39,4 +39,13 @@ class StockController {
             exit();
         }
     }
+
+    // Method untuk menangani Laporan
+    public function reports() {
+        $startDate = $_GET['start_date'] ?? date('Y-m-01');
+        $endDate = $_GET['end_date'] ?? date('Y-m-d');
+
+        $movements = $this->stockModel->getByDateRange($startDate, $endDate);
+        require_once __DIR__ . '/../../views/reports/index.php';
+    }
 }

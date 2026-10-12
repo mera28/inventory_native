@@ -22,11 +22,25 @@ class StockMovement {
         return $stmt->fetchAll();
     }
 
+    // Method baru untuk filter laporan tanggal
+    public function getByDateRange($startDate, $endDate) {
+        $query = "SELECT sm.*, p.name as product_name, p.sku, u.name as user_name 
+                  FROM " . $this->table . " sm 
+                  LEFT JOIN products p ON sm.product_id = p.id 
+                  LEFT JOIN users u ON sm.user_id = u.id 
+                  WHERE DATE(sm.created_at) BETWEEN :start_date AND :end_date 
+                  ORDER BY sm.id DESC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':start_date', $startDate);
+        $stmt->bindParam(':end_date', $endDate);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
     public function create($product_id, $user_id, $type, $quantity, $notes) {
         try {
             $this->conn->beginTransaction();
 
-            // 1. Simpan Transaksi Stok
             $query = "INSERT INTO " . $this->table . " (product_id, user_id, type, quantity, notes) 
                       VALUES (:product_id, :user_id, :type, :quantity, :notes)";
             $stmt = $this->conn->prepare($query);
@@ -37,7 +51,6 @@ class StockMovement {
             $stmt->bindParam(':notes', $notes);
             $stmt->execute();
 
-            // 2. Update Jumlah Stok di Tabel Products
             if ($type === 'in') {
                 $updateQuery = "UPDATE products SET stock = stock + :quantity WHERE id = :product_id";
             } else {

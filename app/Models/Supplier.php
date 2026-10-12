@@ -18,12 +18,32 @@ class Supplier {
         return $stmt->fetchAll();
     }
 
+    public function getById($id) {
+        $query = "SELECT * FROM " . $this->table . " WHERE id = :id LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+
     public function create($name, $phone, $address) {
         $query = "INSERT INTO " . $this->table . " (name, phone, address) VALUES (:name, :phone, :address)";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':phone', $phone);
         $stmt->bindParam(':address', $address);
+        return $stmt->execute();
+    }
+
+    public function update($id, $name, $phone, $address) {
+        $query = "UPDATE " . $this->table . " 
+                  SET name = :name, phone = :phone, address = :address 
+                  WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':name', $name);
+        $stmt->bindParam(':phone', $phone);
+        $stmt->bindParam(':address', $address);
+        $stmt->bindParam(':id', $id);
         return $stmt->execute();
     }
 

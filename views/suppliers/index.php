@@ -26,32 +26,46 @@ if (!isset($_SESSION['user_id'])) {
 
     <div class="container mt-4">
         <div class="row">
-            <!-- Form Tambah Supplier -->
+            <!-- Form Tambah / Edit Supplier -->
             <div class="col-md-4 mb-3">
                 <div class="card shadow-sm">
-                    <div class="card-header bg-warning text-dark">
-                        <h5 class="card-title mb-0">Tambah Supplier</h5>
+                    <div class="card-header <?= $editSupplier ? 'bg-warning text-dark' : 'bg-warning text-dark'; ?>">
+                        <h5 class="card-title mb-0">
+                            <?= $editSupplier ? 'Edit Supplier' : 'Tambah Supplier'; ?>
+                        </h5>
                     </div>
                     <div class="card-body">
-                        <form action="index.php?action=suppliers_store" method="POST">
+                        <form action="index.php?action=<?= $editSupplier ? 'suppliers_update' : 'suppliers_store'; ?>" method="POST">
                             <input type="hidden" name="csrf_token" value="<?= Csrf::generateToken(); ?>">
                             
+                            <?php if ($editSupplier): ?>
+                                <input type="hidden" name="id" value="<?= $editSupplier['id']; ?>">
+                            <?php endif; ?>
+
                             <div class="mb-3">
                                 <label class="form-label">Nama Supplier</label>
-                                <input type="text" name="name" class="form-control" placeholder="PT. Jaya Abadi" required>
+                                <input type="text" name="name" class="form-control" placeholder="PT. Jaya Abadi" required
+                                       value="<?= htmlspecialchars($editSupplier['name'] ?? ''); ?>">
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">No. Telepon</label>
-                                <input type="text" name="phone" class="form-control" placeholder="08123456789">
+                                <input type="text" name="phone" class="form-control" placeholder="08123456789"
+                                       value="<?= htmlspecialchars($editSupplier['phone'] ?? ''); ?>">
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Alamat</label>
-                                <textarea name="address" class="form-control" rows="3" placeholder="Alamat lengkap"></textarea>
+                                <textarea name="address" class="form-control" rows="3" placeholder="Alamat lengkap"><?= htmlspecialchars($editSupplier['address'] ?? ''); ?></textarea>
                             </div>
 
-                            <button type="submit" class="btn btn-warning w-100">Simpan Supplier</button>
+                            <button type="submit" class="btn btn-warning w-100">
+                                <?= $editSupplier ? 'Update Supplier' : 'Simpan Supplier'; ?>
+                            </button>
+
+                            <?php if ($editSupplier): ?>
+                                <a href="index.php?action=suppliers" class="btn btn-outline-secondary w-100 mt-2">Batal Edit</a>
+                            <?php endif; ?>
                         </form>
                     </div>
                 </div>
@@ -72,7 +86,7 @@ if (!isset($_SESSION['user_id'])) {
                                         <th>Nama Supplier</th>
                                         <th>Telepon</th>
                                         <th>Alamat</th>
-                                        <th width="15%" class="text-center">Aksi</th>
+                                        <th width="25%" class="text-center">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -84,6 +98,8 @@ if (!isset($_SESSION['user_id'])) {
                                                 <td><?= htmlspecialchars($sup['phone'] ?? '-'); ?></td>
                                                 <td><?= htmlspecialchars($sup['address'] ?? '-'); ?></td>
                                                 <td class="text-center">
+                                                    <a href="index.php?action=suppliers&edit_id=<?= $sup['id']; ?>" 
+                                                       class="btn btn-warning btn-sm">Edit</a>
                                                     <a href="index.php?action=suppliers_delete&id=<?= $sup['id']; ?>" 
                                                        class="btn btn-danger btn-sm" 
                                                        onclick="return confirm('Hapus supplier ini?')">Hapus</a>

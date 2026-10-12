@@ -26,20 +26,36 @@ if (!isset($_SESSION['user_id'])) {
 
     <div class="container mt-4">
         <div class="row">
-            <!-- Form Tambah Kategori -->
+            <!-- Form Tambah / Edit Kategori -->
             <div class="col-md-4 mb-3">
                 <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="card-title mb-0">Tambah Kategori</h5>
+                    <div class="card-header <?= $editCategory ? 'bg-warning text-dark' : 'bg-primary text-white'; ?>">
+                        <h5 class="card-title mb-0">
+                            <?= $editCategory ? 'Edit Kategori' : 'Tambah Kategori'; ?>
+                        </h5>
                     </div>
                     <div class="card-body">
-                        <form action="index.php?action=categories_store" method="POST">
+                        <form action="index.php?action=<?= $editCategory ? 'categories_update' : 'categories_store'; ?>" method="POST">
                             <input type="hidden" name="csrf_token" value="<?= Csrf::generateToken(); ?>">
+                            
+                            <?php if ($editCategory): ?>
+                                <input type="hidden" name="id" value="<?= $editCategory['id']; ?>">
+                            <?php endif; ?>
+
                             <div class="mb-3">
                                 <label class="form-label">Nama Kategori</label>
-                                <input type="text" name="name" class="form-control" required placeholder="Contoh: Alat Tulis">
+                                <input type="text" name="name" class="form-control" required 
+                                       placeholder="Contoh: Alat Tulis" 
+                                       value="<?= htmlspecialchars($editCategory['name'] ?? ''); ?>">
                             </div>
-                            <button type="submit" class="btn btn-primary w-100">Simpan</button>
+
+                            <button type="submit" class="btn <?= $editCategory ? 'btn-warning' : 'btn-primary'; ?> w-100">
+                                <?= $editCategory ? 'Update Kategori' : 'Simpan Kategori'; ?>
+                            </button>
+
+                            <?php if ($editCategory): ?>
+                                <a href="index.php?action=categories" class="btn btn-outline-secondary w-100 mt-2">Batal Edit</a>
+                            <?php endif; ?>
                         </form>
                     </div>
                 </div>
@@ -57,7 +73,7 @@ if (!isset($_SESSION['user_id'])) {
                                 <tr>
                                     <th width="10%">No</th>
                                     <th>Nama Kategori</th>
-                                    <th width="20%" class="text-center">Aksi</th>
+                                    <th width="25%" class="text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -67,6 +83,8 @@ if (!isset($_SESSION['user_id'])) {
                                             <td><?= $index + 1; ?></td>
                                             <td><?= htmlspecialchars($cat['name']); ?></td>
                                             <td class="text-center">
+                                                <a href="index.php?action=categories&edit_id=<?= $cat['id']; ?>" 
+                                                   class="btn btn-warning btn-sm">Edit</a>
                                                 <a href="index.php?action=categories_delete&id=<?= $cat['id']; ?>" 
                                                    class="btn btn-danger btn-sm" 
                                                    onclick="return confirm('Yakin ingin menghapus kategori ini?')">Hapus</a>

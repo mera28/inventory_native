@@ -9,6 +9,9 @@ require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/app/Helpers/Sanitize.php';
 require_once __DIR__ . '/app/Helpers/Csrf.php';
 
+// Load Models
+require_once __DIR__ . '/app/Models/Product.php';
+
 // Load Controllers
 require_once __DIR__ . '/app/Controllers/AuthController.php';
 require_once __DIR__ . '/app/Controllers/CategoryController.php';
@@ -48,6 +51,9 @@ switch ($action) {
             header("Location: index.php?action=login");
             exit();
         }
+        $productModel = new Product();
+        $summary = $productModel->getSummaryCounts();
+        $lowStockProducts = $productModel->getLowStockProducts();
         require_once __DIR__ . '/views/dashboard.php';
         break;
 
@@ -60,6 +66,11 @@ switch ($action) {
     case 'categories_store':
         if (!isset($_SESSION['user_id'])) { header("Location: index.php?action=login"); exit(); }
         $categoryController->store();
+        break;
+
+    case 'categories_update':
+        if (!isset($_SESSION['user_id'])) { header("Location: index.php?action=login"); exit(); }
+        $categoryController->update();
         break;
 
     case 'categories_delete':
@@ -78,6 +89,11 @@ switch ($action) {
         $productController->store();
         break;
 
+    case 'products_update':
+        if (!isset($_SESSION['user_id'])) { header("Location: index.php?action=login"); exit(); }
+        $productController->update();
+        break;
+
     case 'products_delete':
         if (!isset($_SESSION['user_id'])) { header("Location: index.php?action=login"); exit(); }
         $productController->delete();
@@ -94,6 +110,11 @@ switch ($action) {
         $supplierController->store();
         break;
 
+    case 'suppliers_update':
+        if (!isset($_SESSION['user_id'])) { header("Location: index.php?action=login"); exit(); }
+        $supplierController->update();
+        break;
+
     case 'suppliers_delete':
         if (!isset($_SESSION['user_id'])) { header("Location: index.php?action=login"); exit(); }
         $supplierController->delete();
@@ -108,6 +129,12 @@ switch ($action) {
     case 'stock_store':
         if (!isset($_SESSION['user_id'])) { header("Location: index.php?action=login"); exit(); }
         $stockController->store();
+        break;
+
+    // --- REPORTS ---
+    case 'reports':
+        if (!isset($_SESSION['user_id'])) { header("Location: index.php?action=login"); exit(); }
+        $stockController->reports();
         break;
 
     default:
