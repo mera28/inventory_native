@@ -13,12 +13,16 @@ require_once __DIR__ . '/app/Helpers/Csrf.php';
 require_once __DIR__ . '/app/Controllers/AuthController.php';
 require_once __DIR__ . '/app/Controllers/CategoryController.php';
 require_once __DIR__ . '/app/Controllers/ProductController.php';
+require_once __DIR__ . '/app/Controllers/SupplierController.php';
+require_once __DIR__ . '/app/Controllers/StockController.php';
 
 $action = $_GET['action'] ?? 'login';
 
 $authController = new AuthController();
 $categoryController = new CategoryController();
 $productController = new ProductController();
+$supplierController = new SupplierController();
+$stockController = new StockController();
 
 switch ($action) {
     // --- AUTHENTICATION ---
@@ -77,6 +81,33 @@ switch ($action) {
     case 'products_delete':
         if (!isset($_SESSION['user_id'])) { header("Location: index.php?action=login"); exit(); }
         $productController->delete();
+        break;
+
+    // --- SUPPLIERS ---
+    case 'suppliers':
+        if (!isset($_SESSION['user_id'])) { header("Location: index.php?action=login"); exit(); }
+        $supplierController->index();
+        break;
+
+    case 'suppliers_store':
+        if (!isset($_SESSION['user_id'])) { header("Location: index.php?action=login"); exit(); }
+        $supplierController->store();
+        break;
+
+    case 'suppliers_delete':
+        if (!isset($_SESSION['user_id'])) { header("Location: index.php?action=login"); exit(); }
+        $supplierController->delete();
+        break;
+
+    // --- STOCK MOVEMENTS ---
+    case 'stock':
+        if (!isset($_SESSION['user_id'])) { header("Location: index.php?action=login"); exit(); }
+        $stockController->index();
+        break;
+
+    case 'stock_store':
+        if (!isset($_SESSION['user_id'])) { header("Location: index.php?action=login"); exit(); }
+        $stockController->store();
         break;
 
     default:
